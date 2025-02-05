@@ -42,18 +42,19 @@
 
             // Send the selected color to the Lua script
             fetch(`https://${GetParentResourceName()}/colorPicked`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    color: {
-                        r: rgb.r,
-                        g: rgb.g,
-                        b: rgb.b
-                    }
-                })
-            });
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        color: {
+            r: rgb.r,
+            g: rgb.g,
+            b: rgb.b
+        }
+    })
+});
+
         }
 
         // Convert Hex to RGB

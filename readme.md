@@ -2,7 +2,7 @@
 
 RaySist-Spray is a modern and immersive graffiti spray script designed for FiveM servers using the QBCore framework. Players can buy spray cans and create custom graffiti around the city, adding a unique and personal touch to the environment. Perfect for roleplay servers looking to deepen urban immersion and explore gang-related activities.
 
-![Screenshot of RaySist-Spray in action, displaying colorful graffiti art on a city wall.](https://i.ibb.co/FbF1PxnL/Spray.png)
+![Screenshot of RaySist-Spray in action, displaying colorful graffiti art on a city wall.](https://i.ibb.co/n8jRtZkK/Spray.png)
 
 - [Video Preview Here](https://www.youtube.com/watch?v=DUu8p4HiIhs)
 ---

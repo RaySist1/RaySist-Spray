@@ -69,7 +69,7 @@ function FindRaycastedSprayCoordsNotCached(ped, coords, rayStart, rayDirection)
                 else
                     return false, Config.Text.SPRAY_ERRORS.NOT_FLAT
                 end
-            else 
+            else
                 return false, Config.Text.SPRAY_ERRORS.TOO_FAR
             end
         else
@@ -84,7 +84,7 @@ LastSubtitleText = nil
 function DrawSubtitleText(text)
     if text ~= LastSubtitleText then
         LastSubtitleText = text
-        BeginTextCommandPrint("STRING");  
+        BeginTextCommandPrint("STRING");
         AddTextComponentSubstringPlayerName(text)
         EndTextCommandPrint(5000, 1)
     end
@@ -93,15 +93,15 @@ end
 
 
 function RotationToDirection(rotation)
-	local adjustedRotation = 
-	{ 
-		x = (math.pi / 180) * rotation.x, 
-		y = (math.pi / 180) * rotation.y, 
-		z = (math.pi / 180) * rotation.z 
+	local adjustedRotation =
+	{
+		x = (math.pi / 180) * rotation.x,
+		y = (math.pi / 180) * rotation.y,
+		z = (math.pi / 180) * rotation.z
 	}
 	return vector3(
-        -math.sin(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)), 
-		math.cos(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)), 
+        -math.sin(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
+		math.cos(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
 		math.sin(adjustedRotation.x)
     )
 end
@@ -113,18 +113,18 @@ function CanSeeSpray(camCoords, sprayCoords)
         camCoords.x,
         camCoords.y,
         camCoords.z,
-    
+
         sprayCoords.x,
         sprayCoords.y,
         sprayCoords.z,
-        1, 
+        1,
         PlayerPedId()
     )
 
-    local retval --[[ integer ]], 
-        hit --[[ boolean ]], 
-        endCoords --[[ vector3 ]], 
-        surfaceNormal --[[ vector3 ]], 
+    local retval --[[ integer ]],
+        hit --[[ boolean ]],
+        endCoords --[[ vector3 ]],
+        surfaceNormal --[[ vector3 ]],
         entityHit --[[ Entity ]] = GetShapeTestResult(rayHandle)
 
     return hit == 0
@@ -137,18 +137,18 @@ function CheckRay(ped, coords, direction)
         coords.x,
         coords.y,
         coords.z,
-    
+
         rayEndPoint.x,
         rayEndPoint.y,
         rayEndPoint.z,
-        1, 
+        1,
         ped
     )
 
-    local retval --[[ integer ]], 
-            hit --[[ boolean ]], 
-            endCoords --[[ vector3 ]], 
-            surfaceNormal --[[ vector3 ]], 
+    local retval --[[ integer ]],
+            hit --[[ boolean ]],
+            endCoords --[[ vector3 ]],
+            surfaceNormal --[[ vector3 ]],
             materialHash,
             entityHit --[[ Entity ]] = GetShapeTestResultEx(rayHandle)
 
@@ -166,7 +166,7 @@ function CheckRay(ped, coords, direction)
             coords.x,
             coords.y,
             coords.z,
-        
+
             rayEndPoint.x,
             rayEndPoint.y,
             rayEndPoint.z,
