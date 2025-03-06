@@ -1,5 +1,3 @@
-# ESX VERSION BY "Mistextreme"
-https://github.com/Mistextreme/RaySist-Spray
 
 # Support https://discord.gg/pNvGMgQ2vZ
 
