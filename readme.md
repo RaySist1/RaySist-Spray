@@ -1,5 +1,5 @@
 # ESX VERSION BY "Mistextreme"
-[@Mistextreme][https://github.com/RaySist1](https://github.com/Mistextreme/RaySist-Spray)
+https://github.com/RaySist1](https://github.com/Mistextreme/RaySist-Spray
 
 # RaySist-Spray 🎨
 
