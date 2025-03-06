@@ -5,15 +5,16 @@ QBCore.Functions.CreateUseableItem("spray_remover", function(source)
     local Player = QBCore.Functions.GetPlayer(source)
     local item = Player.Functions.GetItemByName("spray_remover")
     if item then
-        TriggerClientEvent('RaySist_spray:removeClosestSpray', source)
+        TriggerClientEvent('RaySist-spray:removeClosestSpray', source)
+        TriggerClientEvent('QBCore:Notify', source, 'Stai rimuovendo lo spray!', "success")
     else
-        TriggerClientEvent('QBCore:Notify', source, 'You dont have a kit to remove the spray!', "error")
+        TriggerClientEvent('QBCore:Notify', source, 'Non hai un kit per rimuovere lo spray!', "error")
     end
 end)
 
 
-RegisterNetEvent('RaySist_spray:remove')
-AddEventHandler('RaySist_spray:remove', function(pos)
+RegisterNetEvent('RaySist-spray:remove')
+AddEventHandler('RaySist-spray:remove', function(pos)
     local Source = source
 
     local xPlayer = QBCore.Functions.GetPlayer(Source)
@@ -36,14 +37,14 @@ AddEventHandler('RaySist_spray:remove', function(pos)
                 SPRAYS[idx] = nil
             end
         end
-        TriggerClientEvent('RaySist_spray:setSprays', -1, SPRAYS)
+        TriggerClientEvent('RaySist-spray:setSprays', -1, SPRAYS)
 
         local sprayAtCoordsAfterRemoval = GetSprayAtCoords(pos)
 
         -- ensure someone doesnt bug it so its trying to remove other tags
         -- while deducting loyalty from not-deleted-but-at-coords tag
         if sprayAtCoords and not sprayAtCoordsAfterRemoval then
-            TriggerEvent('RaySist_sprays:removeSpray', Source, sprayAtCoords.text, sprayAtCoords.location)
+            TriggerEvent('RaySist-sprays:removeSpray', Source, sprayAtCoords.text, sprayAtCoords.location)
         end
     end
 end)

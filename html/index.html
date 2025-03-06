@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spray Input</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: none;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgb(31, 41, 55);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            min-width: 300px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid rgb(75, 85, 99);
+            background: rgb(55, 65, 81);
+            color: white;
+            border-radius: 0.25rem;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: rgb(59, 130, 246);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .confirm {
+            background: rgb(59, 130, 246);
+            color: white;
+        }
+
+        .cancel {
+            background: rgb(239, 68, 68);
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-group">
+            <input type="text" id="sprayText" maxlength="9" placeholder="Enter text to spray...">
+        </div>
+        <div class="buttons">
+            <button class="confirm" id="confirm">Spray</button>
+            <button class="cancel" id="cancel">Cancel</button>
+        </div>
+    </div>
+    <script>
+        const body = document.querySelector('body');
+        const input = document.getElementById('sprayText');
+        const confirmBtn = document.getElementById('confirm');
+        const cancelBtn = document.getElementById('cancel');
+
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'open') {
+                body.style.display = 'block';
+                input.focus();
+            }
+        });
+
+        confirmBtn.addEventListener('click', () => {
+            const text = input.value.trim();
+            if (text) {
+                fetch(`https://${GetParentResourceName()}/confirmSpray`, {
+                    method: 'POST',
+                    body: JSON.stringify({ text })
+                });
+            }
+            closeUI();
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            fetch(`https://${GetParentResourceName()}/cancelSpray`, {
+                method: 'POST'
+            });
+            closeUI();
+        });
+
+        function closeUI() {
+            body.style.display = 'none';
+            input.value = '';
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                fetch(`https://${GetParentResourceName()}/cancelSpray`, {
+                    method: 'POST'
+                });
+                closeUI();
+            }
+        });
+    </script>
+</body>
+</html>

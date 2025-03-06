@@ -1,6 +1,16 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-SPRAYS = {}
+-- Register the useable item
+QBCore.Functions.CreateUseableItem("spray", function(source)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player.Functions.GetItemByName("spray") then
+        TriggerClientEvent("RaySist-spray:useSprayItem", source)
+    end
+end)
+
+SPRAYS = {
+}
+
 FastBlacklist = {}
 
 Citizen.CreateThread(function()
@@ -19,9 +29,10 @@ function GetSprayAtCoords(pos)
     end
 end
 
-RegisterNetEvent('RaySist_spray:addSpray')
-AddEventHandler('RaySist_spray:addSpray', function(spray)
+RegisterNetEvent('RaySist-spray:addSpray')
+AddEventHandler('RaySist-spray:addSpray', function(spray)
     local source = source
+
     local xPlayer = QBCore.Functions.GetPlayer(source)
     local item = xPlayer.Functions.GetItemByName("spray")
 
@@ -38,8 +49,8 @@ AddEventHandler('RaySist_spray:addSpray', function(spray)
         end
 
         PersistSpray(spray)
-        TriggerEvent('RaySist_sprays:addSpray', source, spray.text, spray.location)
-        TriggerClientEvent('RaySist_spray:setSprays', -1, SPRAYS)
+        TriggerEvent('RaySist-sprays:addSpray', source, spray.text, spray.location)
+        TriggerClientEvent('RaySist-spray:setSprays', -1, SPRAYS)
     else
         TriggerClientEvent('chat:addMessage', source, {
             template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
@@ -47,77 +58,10 @@ AddEventHandler('RaySist_spray:addSpray', function(spray)
         })
     end
 end)
-
--- ✅ MAKE SPRAY ITEM USABLE
-QBCore.Functions.CreateUseableItem("spray", function(source)
-    local xPlayer = QBCore.Functions.GetPlayer(source)
-    if xPlayer.Functions.GetItemByName("spray") then
-        -- Prompt player for text input (handled on client-side)
-        TriggerClientEvent('RaySist_spray:promptSprayText', source)
-    end
-end)
-
--- ✅ HANDLE SPRAY INPUT FROM CLIENT
-RegisterNetEvent('RaySist_spray:processSpray')
-AddEventHandler('RaySist_spray:processSpray', function(sprayText)
-    local source = source
-    local xPlayer = QBCore.Functions.GetPlayer(source)
-    local item = xPlayer.Functions.GetItemByName("spray")
-
-    if item then
-        if FastBlacklist[sprayText] then
-            TriggerClientEvent('chat:addMessage', source, {
-                template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
-                args = {Config.Text.BLACKLISTED}
-            })
-        elseif sprayText and sprayText:len() <= 9 then
-            TriggerClientEvent('RaySist_spray:spray', source, sprayText)
-        else
-            TriggerClientEvent('chat:addMessage', source, {
-                template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
-                args = {Config.Text.WORD_LONG}
-            })
-        end
-    else
-        TriggerClientEvent('chat:addMessage', source, {
-            template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
-            args = {Config.Text.NEED_SPRAY}
-        })
-    end
-end)
-
--- ✅ FIXED /SPRAY COMMAND
-RegisterCommand('spray', function(source, args)
-    local xPlayer = QBCore.Functions.GetPlayer(source)
-    local item = xPlayer.Functions.GetItemByName("spray")
-
-    if item then
-        local sprayText = args[1]
-
-        if FastBlacklist[sprayText] then
-            TriggerClientEvent('chat:addMessage', source, {
-                template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
-                args = {Config.Text.BLACKLISTED}
-            })
-        elseif sprayText and sprayText:len() <= 9 then
-            TriggerClientEvent('RaySist_spray:spray', source, sprayText)
-        else
-            TriggerClientEvent('chat:addMessage', source, {
-                template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
-                args = {Config.Text.WORD_LONG}
-            })
-        end
-    else
-        TriggerClientEvent('chat:addMessage', source, {
-            template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
-            args = {Config.Text.NEED_SPRAY}
-        })
-    end
-end, false)
 
 function PersistSpray(spray)
     MySQL.Async.execute([[
-        INSERT INTO sprays
+        INSERT sprays
         (`x`, `y`, `z`, `rx`, `ry`, `rz`, `scale`, `text`, `font`, `color`, `interior`)
         VALUES
         (@x, @y, @z, @rx, @ry, @rz, @scale, @text, @font, @color, @interior)
@@ -134,4 +78,82 @@ function PersistSpray(spray)
         ['@color'] = spray.originalColor,
         ['@interior'] = spray.interior,
     })
+end
+
+Citizen.CreateThread(function()
+    MySQL.Sync.execute([[
+        DELETE FROM sprays
+        WHERE DATEDIFF(NOW(), created_at) >= @days
+    ]], {['days'] = Config.SPRAY_PERSIST_DAYS})
+
+    local results = MySQL.Sync.fetchAll([[
+        SELECT x, y, z, rx, ry, rz, scale, text, font, color, created_at, interior
+        FROM sprays
+    ]])
+
+    for _, s in pairs(results) do
+        table.insert(SPRAYS, {
+            location = vector3(s.x + 0.0, s.y + 0.0, s.z + 0.0),
+            realRotation = vector3(s.rx + 0.0, s.ry + 0.0, s.rz + 0.0),
+            scale = tonumber(s.scale) + 0.0,
+            text = s.text,
+            font = s.font,
+            originalColor = s.color,
+            interior = (s.interior == 1) and true or false,
+        })
+    end
+
+    TriggerClientEvent('RaySist-spray:setSprays', -1, SPRAYS)
+end)
+
+RegisterNetEvent('RaySist-spray:playerSpawned')
+AddEventHandler('RaySist-spray:playerSpawned', function()
+    local source = source
+    TriggerClientEvent('RaySist-spray:setSprays', source, SPRAYS)
+end)
+
+RegisterCommand('spray', function(source, args)
+    local source = source
+    local xPlayer = QBCore.Functions.GetPlayer(source)
+    local item = xPlayer.Functions.GetItemByName("spray")
+
+    if item then
+        local sprayText = args[1]
+
+        if FastBlacklist[sprayText] then
+            TriggerClientEvent('chat:addMessage', source, {
+                template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
+                args = {Config.Text.BLACKLISTED}
+            })
+        else
+            if sprayText then
+                if sprayText:len() <= 9 then
+                    TriggerClientEvent('RaySist-spray:spray', source, args[1])
+                else
+                    TriggerClientEvent('chat:addMessage', source, {
+                        template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
+                        args = {Config.Text.WORD_LONG}
+                    })
+                end
+            else
+                TriggerClientEvent('chat:addMessage', source, {
+                    template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
+                    args = {Config.Text.USAGE}
+                })
+            end
+        end
+    else
+        TriggerClientEvent('chat:addMessage', source, {
+            template = '<div style="background: rgb(180, 136, 29); color: rgb(255, 255, 255); padding: 5px;">{0}</div>',
+            args = {Config.Text.NEED_SPRAY}
+        })
+    end
+end, false)
+
+function HasSpray(serverId, cb)
+    local source = source
+    local xPlayer = QBCore.Functions.GetPlayer(source)
+    local item = xPlayer.Functions.GetItemByName("spray")
+
+    cb(item.count > 0)
 end

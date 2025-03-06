@@ -1,28 +1,31 @@
-fx_version 'bodacious'
+fx_version 'cerulean'
 game 'gta5'
 
-description 'RaySist spray'
+description 'RaySist-Spray'
+version '1.0.2'
 
-version '1.0'
+shared_scripts {
+    '@qb-core/shared/locale.lua',
+    'config.lua'
+}
 
 client_scripts {
-	'config.lua',
-	'client/warmenu.lua',
-	'client/fonts.lua',
-	'client/determinant.lua',
-	'client/raycast.lua',
-	'client/client.lua',
-	'client/spray_rotation.lua',
-	'client/control.lua',
-	'client/remove.lua',
-	'client/time.lua',
-	'client/cancellable_progress.lua',
+    'client/warmenu.lua',
+    'client/fonts.lua',
+    'client/determinant.lua',
+    'client/raycast.lua',
+    'client/client.lua',
+    'client/spray_rotation.lua',
+    'client/control.lua',
+    'client/remove.lua',
+    'client/time.lua',
+    'client/cancellable_progress.lua'
 }
 
 server_scripts {
-	'config.lua',
-	'@mysql-async/lib/MySQL.lua',
-	'server/db.lua',
-	'server/server.lua',
-	'server/remove.lua',
+    '@oxmysql/lib/MySQL.lua',
+    'server/server.lua'
 }
+
+lua54 'yes'
+use_fxv2_oal 'yes'

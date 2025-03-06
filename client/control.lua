@@ -10,7 +10,7 @@ FormattedSprayText = ''
 
 SprayColor = 1
 
-SprayScaleMin = 60
+SprayScaleMin = 20
 SprayScaleMax = 200
 CurrentSprayScale = 40
 SprayScale = 1
@@ -37,8 +37,8 @@ function ResetFormattedText()
     end
 end
 
-RegisterNetEvent('RaySist_spray:spray')
-AddEventHandler('RaySist_spray:spray', function(text)
+RegisterNetEvent('RaySist-spray:spray')
+AddEventHandler('RaySist-spray:spray', function(text)
     if not IsSpraying then
         if text then
             SprayText = text
@@ -132,7 +132,7 @@ function PersistSpray()
             'weed_spraybottle_stand_spraying_01_inspector',
             16,
             function() -- success
-                TriggerServerEvent('RaySist_spray:addSpray', {
+                TriggerServerEvent('RaySist-spray:addSpray', {
                     location = sprayLocation,
                     realRotation = currentComputedRotation,
 

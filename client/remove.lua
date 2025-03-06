@@ -1,5 +1,5 @@
-RegisterNetEvent('RaySist_spray:removeClosestSpray')
-AddEventHandler('RaySist_spray:removeClosestSpray', function()
+RegisterNetEvent('RaySist-spray:removeClosestSpray')
+AddEventHandler('RaySist-spray:removeClosestSpray', function()
     TriggerEvent('lsrp_inventory:close')
 
     local ped = PlayerPedId()
@@ -31,7 +31,7 @@ AddEventHandler('RaySist_spray:removeClosestSpray', function()
             1,
             function()
                 RemoveSprayRemoveProp(ragProp)
-                TriggerServerEvent('RaySist_spray:remove', closestSprayLoc)
+                TriggerServerEvent('RaySist-spray:remove', closestSprayLoc)
             end,
             function()
                 RemoveSprayRemoveProp(ragProp)

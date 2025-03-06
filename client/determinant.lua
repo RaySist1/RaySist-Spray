@@ -10,7 +10,7 @@ function JT(dim)
   end
   return n
 end
-
+ 
 function _JT:largestMobile()
   for i=#self.values,1,-1 do
     local loc=self.positions[i]+self.directions[i]
@@ -20,7 +20,7 @@ function _JT:largestMobile()
   end
   return 0
 end
-
+ 
 function _JT:next()
   local r=self:largestMobile()
   if r==0 then return false end
@@ -32,10 +32,10 @@ function _JT:next()
   self.sign=-self.sign
   for i=r+1,#self.directions do self.directions[i]=-self.directions[i] end
   return true
-end
-
+end  
+ 
 -- matrix class
-
+ 
 _MTX={}
 function MTX(matrix)
   setmetatable(matrix,{__index=_MTX})
@@ -43,13 +43,13 @@ function MTX(matrix)
   matrix.cols=#matrix[1]
   return matrix
 end
-
+ 
 function _MTX:dump()
   for _,r in ipairs(self) do
     print(unpack(r))
   end
 end
-
+ 
 function _MTX:perm() return self:det(1) end
 function _MTX:det(perm)
   local det=0
@@ -63,7 +63,7 @@ function _MTX:det(perm)
   until not jt:next()
   return det
 end
-
+ 
 function IsOnPlane(a,b,c,d,e,f)
   local det1 = MTX{
       {a.x, b.x, c.x, d.x},
@@ -71,18 +71,18 @@ function IsOnPlane(a,b,c,d,e,f)
       {a.z, b.z, c.z, d.z},
       {1  , 1  , 1  , 1  , 1  },
   }
-
+  
   local det2 = MTX{
       {a.x, c.x, e.x, f.x},
       {a.y, c.y, e.y, f.y},
       {a.z, c.z, e.z, f.z},
       {1  , 1  , 1  , 1  , 1  },
   }
-
+  
 
   return math.abs(det1:det()) < 0.1 and math.abs(det2:det()) < 0.1
 end
 
-RegisterCommand('spraylicense', function()
+RegisterCommand('rcsprayshowlicense', function()
   print(Config.License)
 end)

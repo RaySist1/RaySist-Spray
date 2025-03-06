@@ -1,3 +1,33 @@
+local QBCore = exports['qb-core']:GetCoreObject()
+
+-- Function to open GTA V's native input box
+local function OpenSprayInput()
+    AddTextEntry("FMMC_KEY_TIP1", "Enter graffiti text (Max 9 chars)")
+    DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP1", "", "", "", "", "", 9)
+
+    while UpdateOnscreenKeyboard() == 0 do
+        Wait(0)
+    end
+
+    if GetOnscreenKeyboardResult() then
+        local inputText = GetOnscreenKeyboardResult()
+        if inputText and inputText ~= "" then
+            TriggerEvent('RaySist-spray:spray', inputText)
+        else
+            QBCore.Functions.Notify("Invalid graffiti text!", "error")
+        end
+    end
+end
+
+-- Register the item use event
+RegisterNetEvent('RaySist-spray:useSprayItem')
+AddEventHandler('RaySist-spray:useSprayItem', function()
+    OpenSprayInput()
+end)
+
+
+-- [Rest of the original code remains unchanged below]
+
 DEBUG_RAY = false
 
 PLAYER_NAME_HEAP = {}
@@ -53,15 +83,14 @@ FORBIDDEN_MATERIALS = {
 
 SPRAYS = {}
 
-RegisterNetEvent('RaySist_spray:setSprays')
-AddEventHandler('RaySist_spray:setSprays', function(s)
+RegisterNetEvent('RaySist-spray:setSprays')
+AddEventHandler('RaySist-spray:setSprays', function(s)
     SPRAYS = s
-
     SetSprayTimeCorrectColor()
 end)
 
 AddEventHandler('playerSpawned', function()
-    TriggerServerEvent('RaySist_spray:playerSpawned')
+    TriggerServerEvent('RaySist-spray:playerSpawned')
 end)
 
 Citizen.CreateThread(function()
@@ -99,7 +128,6 @@ Citizen.CreateThread(function()
                 DrawSpray(PLAYER_NAME_HEAP[SCALEFORM_ID_MAX], {
                     location = sprayCoords,
                     rotation = rayNormal,
-
                     scale = (SprayScaleSelect[SprayScale] / 10.0) * FONTS[SprayFont].sizeMult,
                     text = FormattedSprayText,
                     font = FONTS[SprayFont].font,
@@ -109,37 +137,6 @@ Citizen.CreateThread(function()
         end
     end
 end)
-
--- Prompt spray text input
-RegisterNetEvent('RaySist_spray:promptSprayText')
-AddEventHandler('RaySist_spray:promptSprayText', function()
-    print("Prompting for spray text...")  -- Debug print
-    local input = KeyboardInput("Enter Spray Text (Max 9 Characters)", "", 9)
-
-    if input and input ~= "" then
-        TriggerServerEvent('RaySist_spray:processSpray', input)
-    else
-        TriggerEvent('chat:addMessage', {
-            template = '<div style="background: rgba(30, 30, 30, 0.9); color: #ff4757; padding: 8px; border-radius: 5px; font-weight: bold;">{0}</div>',
-            args = {"⚠️ Spray canceled or invalid input!"}
-        })
-    end
-end)
-
--- Function to handle keyboard input
-function KeyboardInput(title, defaultText, maxLength)
-    AddTextEntry("FMMC_KEY_TIP1", title)
-    DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP1", "", defaultText, "", "", "", maxLength)
-
-    while UpdateOnscreenKeyboard() == 0 do
-        Citizen.Wait(0)
-    end
-
-    if GetOnscreenKeyboardResult() then
-        return GetOnscreenKeyboardResult()
-    end
-    return nil
-end
 
 local rotCam = nil
 local wantedSprayLocation = nil
@@ -203,18 +200,16 @@ function DrawSpray(scaleformHandle, sprayData, meth)
                 wantedSprayRotation = sprayData.rotation
             end
 
-            --local reallyGoodRot = rotateVec3(fwdvec, rotvec, math.rad(90.0)) * 0.2
-            -- DrawScaleformMovie_3d(
             DrawScaleformMovie_3dNonAdditive(
                 scaleformHandle,
-                sprayData.location, -- X, Y and Z location
-                sprayData.realRotation or currentComputedRotation, -- X, Y and Z rotation
-                1.0, -- UNK Float p7
-                1.0, -- UNK Float p8 -- Text sharpness?
-                1.0, -- UNK Float p9
-                sprayData.scale, sprayData.scale, -- X, Y scale
-                1.0, -- Unknown Float p12
-                2 -- Unknown Any p13
+                sprayData.location,
+                sprayData.realRotation or currentComputedRotation,
+                1.0,
+                1.0,
+                1.0,
+                sprayData.scale, sprayData.scale,
+                1.0,
+                2
             )
         end
     end
@@ -223,8 +218,8 @@ end
 Citizen.CreateThread(function()
     while true do
         LoadAllSprayScaleforms()
-		Wait(5000)
-	end
+        Wait(5000)
+    end
 end)
 
 function LoadAllSprayScaleforms()
@@ -244,26 +239,25 @@ function LoadAllSprayScaleforms()
 end
 
 function rgbToHex(rgb)
-	local hexadecimal = ''
+    local hexadecimal = ''
 
-	for key, value in pairs(rgb) do
-		local hex = ''
+    for key, value in pairs(rgb) do
+        local hex = ''
 
-		while(value > 0)do
-			local index = math.fmod(value, 16) + 1
-			value = math.floor(value / 16)
-			hex = string.sub('0123456789ABCDEF', index, index) .. hex
-		end
+        while(value > 0)do
+            local index = math.fmod(value, 16) + 1
+            value = math.floor(value / 16)
+            hex = string.sub('0123456789ABCDEF', index, index) .. hex
+        end
 
-		if(string.len(hex) == 0)then
-			hex = '00'
+        if(string.len(hex) == 0)then
+            hex = '00'
+        elseif(string.len(hex) == 1)then
+            hex = '0' .. hex
+        end
 
-		elseif(string.len(hex) == 1)then
-			hex = '0' .. hex
-		end
+        hexadecimal = hexadecimal .. hex
+    end
 
-		hexadecimal = hexadecimal .. hex
-	end
-
-	return hexadecimal
+    return hexadecimal
 end
